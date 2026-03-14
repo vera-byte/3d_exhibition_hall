@@ -554,6 +554,8 @@ var ModelViewer = class {
     if (modelPath) {
       const format = this.detectFormat(modelPath);
       this.loadModel(modelPath, format);
+    } else {
+      this.loadModel("3dmodels/vision_lod_a.kn5.obj", "obj");
     }
   }
   // ==========================================
@@ -566,6 +568,7 @@ var ModelViewer = class {
    * 从多个文件加载模型（支持 OBJ + MTL 同时选择）
    */
   loadModelFromFiles(files) {
+    console.log("loadModelFromFiles", files);
     if (files.length === 0)
       return;
     const objFiles = files.filter((f) => f.name.toLowerCase().endsWith(".obj"));

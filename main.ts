@@ -693,6 +693,9 @@ class ModelViewer {
         if (modelPath) {
             const format = this.detectFormat(modelPath);
             this.loadModel(modelPath, format);
+        } else {
+            // 默认加载本地模型
+            this.loadModel('3dmodels/vision_lod_a.kn5.obj', 'obj');
         }
     }
 
