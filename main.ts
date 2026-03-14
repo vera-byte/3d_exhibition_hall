@@ -442,6 +442,21 @@ class ModelViewer {
         this.setupViewButtons();
         this.setupControlPanel();
         this.setupColorPickers();
+        this.setupTogglePanel();
+    }
+
+    /**
+     * 设置切换控制面板按钮
+     */
+    private setupTogglePanel(): void {
+        const toggleBtn = document.getElementById('toggle-panel');
+        const controlsPanel = document.querySelector('.controls-panel');
+        
+        if (toggleBtn && controlsPanel) {
+            toggleBtn.addEventListener('click', () => {
+                controlsPanel.classList.toggle('visible');
+            });
+        }
     }
 
     private setupDragDrop(): void {
@@ -909,7 +924,31 @@ class ModelViewer {
      */
     private loadOBJ(path: string): void {
         const loader = new OBJLoader();
+        
+        // 检查是否存在同名 MTL 文件
+        const mtlPath = path.replace(/\.obj$/i, '.mtl');
+        
+        // 尝试加载 MTL 材质
+        const mtlLoader = new MTLLoader();
+        mtlLoader.load(
+            mtlPath,
+            (materials) => {
+                materials.preload();
+                loader.setMaterials(materials);
+                this.loadOBJWithPath(path, loader);
+            },
+            undefined,
+            () => {
+                // MTL 不存在，直接加载 OBJ
+                this.loadOBJWithPath(path, loader);
+            }
+        );
+    }
 
+    /**
+     * 使用 OBJLoader 加载 OBJ 文件
+     */
+    private loadOBJWithPath(path: string, loader: OBJLoader): void {
         loader.load(
             path,
             (object) => {
@@ -922,7 +961,7 @@ class ModelViewer {
             },
             (error) => {
                 console.error('加载失败:', error);
-                this.updateStatus('加载失败');
+                this.updateStatus('模型加载失败');
             }
         );
     }

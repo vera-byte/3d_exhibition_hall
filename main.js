@@ -348,6 +348,19 @@ var ModelViewer = class {
     this.setupViewButtons();
     this.setupControlPanel();
     this.setupColorPickers();
+    this.setupTogglePanel();
+  }
+  /**
+   * 设置切换控制面板按钮
+   */
+  setupTogglePanel() {
+    const toggleBtn = document.getElementById("toggle-panel");
+    const controlsPanel = document.querySelector(".controls-panel");
+    if (toggleBtn && controlsPanel) {
+      toggleBtn.addEventListener("click", () => {
+        controlsPanel.classList.toggle("visible");
+      });
+    }
   }
   setupDragDrop() {
     const dropZone = this.container;
@@ -730,6 +743,25 @@ var ModelViewer = class {
    */
   loadOBJ(path) {
     const loader = new OBJLoader();
+    const mtlPath = path.replace(/\.obj$/i, ".mtl");
+    const mtlLoader = new MTLLoader();
+    mtlLoader.load(
+      mtlPath,
+      (materials) => {
+        materials.preload();
+        loader.setMaterials(materials);
+        this.loadOBJWithPath(path, loader);
+      },
+      void 0,
+      () => {
+        this.loadOBJWithPath(path, loader);
+      }
+    );
+  }
+  /**
+   * 使用 OBJLoader 加载 OBJ 文件
+   */
+  loadOBJWithPath(path, loader) {
     loader.load(
       path,
       (object) => {
@@ -742,7 +774,7 @@ var ModelViewer = class {
       },
       (error) => {
         console.error("\u52A0\u8F7D\u5931\u8D25:", error);
-        this.updateStatus("\u52A0\u8F7D\u5931\u8D25");
+        this.updateStatus("\u6A21\u578B\u52A0\u8F7D\u5931\u8D25");
       }
     );
   }
