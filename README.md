@@ -8,7 +8,8 @@
 ## 预览
 ![预览](./assets/preview.png)
 
-
+在线预览
+[https://github.com/vera-byte.github.io/3d_exhibition_hall/](https://github.com/vera-byte.github.io/3d_exhibition_hall/)
 
 ## 技术栈
 
