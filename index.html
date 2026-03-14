@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D模型展厅 - 通用展示</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- 加载屏幕 -->
+    <div id="loading-screen">
+        <div class="loader">
+            <div class="loader-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                </svg>
+            </div>
+            <div class="loading-text">加载中...</div>
+        </div>
+    </div>
+
+    <!-- 头部信息 -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                </svg>
+                <span>3D模型展厅</span>
+            </div>
+            <div class="model-info">
+                <span id="model-name">未加载模型</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <span id="status" class="status">等待加载模型...</span>
+        </div>
+    </header>
+
+    <!-- 画布容器 -->
+    <div id="canvas-container">
+        <div class="drop-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            <span>拖拽模型文件到此处</span>
+            <span class="formats">支持 GLTF, GLB, STL, OBJ, MTL 格式</span>
+        </div>
+    </div>
+
+    <!-- 控制面板 -->
+    <div class="controls-panel">
+        
+        <!-- 模型上传 -->
+        <div class="control-group">
+            <label class="control-label">加载模型</label>
+            <label class="upload-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                <span>选择文件</span>
+                <input type="file" id="file-input" accept=".gltf,.glb,.stl,.obj,.mtl" multiple hidden>
+            </label>
+        </div>
+
+        <!-- 视角控制 -->
+        <div class="control-group">
+            <label class="control-label">视角</label>
+            <div class="view-buttons">
+                <button class="view-btn active" data-view="default" title="默认视角">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 3v9l6 3" />
+                    </svg>
+                </button>
+                <button class="view-btn" data-view="front" title="正面">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="8" width="16" height="10" rx="2" />
+                    </svg>
+                </button>
+                <button class="view-btn" data-view="side" title="侧面">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 14h20" />
+                        <circle cx="7" cy="14" r="2" />
+                        <circle cx="17" cy="14" r="2" />
+                    </svg>
+                </button>
+                <button class="view-btn" data-view="back" title="背面">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="8" width="16" height="10" rx="2" />
+                    </svg>
+                </button>
+                <button class="view-btn" data-view="top" title="俯视">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <ellipse cx="12" cy="12" rx="8" ry="4" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 自动旋转 -->
+        <div class="control-group">
+            <label class="control-label">自动旋转</label>
+            <button id="toggle-auto-rotate" class="action-btn active" title="360°环绕">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                    <path d="M21 3v5h-5" />
+                </svg>
+                <span>360°</span>
+            </button>
+        </div>
+
+        <!-- 背景设置 -->
+        <div class="control-group">
+            <label class="control-label">背景色</label>
+            <div class="bg-options">
+                <button class="bg-btn active" data-bg="0x1a1a2e" style="background: #1a1a2e;"></button>
+                <button class="bg-btn" data-bg="0x0a0a0f" style="background: #0a0a0f;"></button>
+                <button class="bg-btn" data-bg="0x2d3436" style="background: #2d3436;"></button>
+                <button class="bg-btn" data-bg="0xffffff" style="background: #ffffff;"></button>
+                <button class="bg-btn" data-bg="0x74b9ff" style="background: #74b9ff;"></button>
+                <button class="bg-btn" data-bg="0x00cec9" style="background: #00cec9;"></button>
+            </div>
+            <div class="color-picker-row">
+                <input type="color" id="bg-color-picker" value="#1a1a2e" title="自定义背景色">
+            </div>
+        </div>
+
+        <!-- 背景图片 -->
+        <div class="control-group">
+            <label class="control-label">背景图片</label>
+            <label class="upload-btn small">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                </svg>
+                <span>上传</span>
+                <input type="file" id="bg-image-input" accept="image/*" hidden>
+            </label>
+            <select id="bg-image-mode" class="mode-select">
+                <option value="cover">覆盖</option>
+                <option value="contain">包含</option>
+                <option value="stretch">拉伸</option>
+                <option value="center">居中</option>
+                <option value="repeat">平铺</option>
+            </select>
+            <button id="set-transparent" class="action-btn small">透明</button>
+        </div>
+
+        <!-- 渐变背景 -->
+        <div class="control-group">
+            <label class="control-label">渐变背景</label>
+            <div class="gradient-row">
+                <input type="color" id="gradient-color1" value="#667eea" title="起始色">
+                <input type="color" id="gradient-color2" value="#764ba2" title="结束色">
+                <button id="apply-gradient" class="action-btn small">应用</button>
+            </div>
+        </div>
+
+        <!-- 地面设置 -->
+        <div class="control-group">
+            <label class="control-label">地面</label>
+            <div class="color-picker-row">
+                <input type="color" id="floor-color" value="#0a0a0f" title="地面颜色">
+            </div>
+            <div class="slider-row">
+                <input type="range" id="floor-opacity" min="0" max="1" step="0.1" value="1" title="透明度">
+            </div>
+            <button id="floor-transparent" class="action-btn small">隐藏地面</button>
+        </div>
+
+        <!-- 灯光颜色 -->
+        <div class="control-group">
+            <label class="control-label">灯光颜色</label>
+            <div class="color-picker-row">
+                <div class="light-color-item">
+                    <span>环境</span>
+                    <input type="color" id="ambient-color" value="#ffffff">
+                </div>
+                <div class="light-color-item">
+                    <span>主光</span>
+                    <input type="color" id="main-light-color" value="#ffffff">
+                </div>
+            </div>
+            <div class="color-picker-row">
+                <div class="light-color-item">
+                    <span>填充</span>
+                    <input type="color" id="fill-light-color" value="#8888ff">
+                </div>
+                <div class="light-color-item">
+                    <span>轮廓</span>
+                    <input type="color" id="rim-light-color" value="#ffaa88">
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="control-group">
+            <label class="control-label">操作</label>
+            <div class="action-buttons">
+                <button id="toggle-grid" class="action-btn active" title="显示网格">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                        <line x1="3" y1="9" x2="21" y2="9" />
+                        <line x1="3" y1="15" x2="21" y2="15" />
+                        <line x1="9" y1="3" x2="9" y2="21" />
+                        <line x1="15" y1="3" x2="15" y2="21" />
+                    </svg>
+                    <span>网格</span>
+                </button>
+                <button id="reset-view" class="action-btn" title="重置视角">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                    </svg>
+                </button>
+                <button id="fullscreen" class="action-btn primary" title="全屏">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js 导入映射 -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>
